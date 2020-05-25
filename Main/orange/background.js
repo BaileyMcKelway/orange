@@ -11,6 +11,7 @@ chrome.runtime.onMessage.addListener(receiver);
 function receiver(request, sender, sendResponse) {
   if (request.state === 'recording') {
     if (stop === false) {
+      stop = true;
       recognition.stop();
     }
     bgButton = request.button;

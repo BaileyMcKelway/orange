@@ -6,6 +6,11 @@ let isRecording = false;
 // Receive messages from popup
 function gotMessage(message, sender, sendResponse) {
   if (message.txt === 'recording') {
+    //Stop listening if listening
+    let msg = {
+      state: 'stop',
+    };
+    chrome.runtime.sendMessage(msg);
     // Highlights Recordable Buttons
     isRecording = true;
     const buttons = document.getElementsByTagName('button');
