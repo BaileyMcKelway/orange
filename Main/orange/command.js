@@ -32,6 +32,8 @@ chrome.extension.onMessage.addListener(function (
         const td = document.createElement('td');
         const a = document.createElement('a');
         a.classList.add('square_btn35');
+        a.classList.add(mainKeys);
+        a.id = secondary;
         const linkText = document.createTextNode('x');
         a.appendChild(linkText);
         a.href = '#';
@@ -47,3 +49,17 @@ chrome.extension.onMessage.addListener(function (
     commands.appendChild(div);
   }
 });
+
+document.querySelector('#commands').addEventListener('click', removeClick);
+
+function removeClick(event) {
+  const commandWord = event.target.id;
+  const hostURL = event.target.className.split(' ')[1];
+  console.log(commandWord, hostURL);
+  chrome.runtime.sendMessage({
+    state: 'remove',
+    command: commandWord,
+    host: hostURL,
+  });
+  event.target.parentElement.remove();
+}

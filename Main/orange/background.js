@@ -24,7 +24,6 @@ function receiver(request, sender, sendResponse) {
       recordedCommands: JSON.stringify(recordedCommands),
     });
   } else if (request.state === 'start') {
-    console.log('hi');
     (activeTab = request.host),
       (recording = false),
       (stop = false),
@@ -35,6 +34,11 @@ function receiver(request, sender, sendResponse) {
       (stop = true),
       recognition.stop(),
       console.log(request);
+  } else if (request.state === 'remove') {
+    const host = request.host;
+    const command = request.command;
+    const currentHostObject = recordedCommands[host];
+    delete currentHostObject[command];
   }
 }
 
