@@ -7,14 +7,6 @@ let recordedCommands = {};
 
 chrome.runtime.onMessage.addListener(receiver);
 
-chrome.runtime.sendMessage({
-  msg: 'something_completed',
-  data: {
-    subject: 'Loading',
-    content: 'Just completed!',
-  },
-});
-
 // RECEIVE MESSAGE FUNCTION
 function receiver(request, sender, sendResponse) {
   if (request.state === 'recording') {
@@ -27,29 +19,18 @@ function receiver(request, sender, sendResponse) {
     stop = true;
     recognition.start();
     console.log(request);
-  } else if (request.state === 'start') {
-    chrome.storage.local.sync.set(
-      { recordedCommands: recordedCommands },
-      function () {
-        console.log(recordedCommands);
-      }
-    );
-    chrome.storage.local.sync.get(['recordedCommands'], function (result) {
-      console.log('Value currently is ' + result.recordedCommands);
-      recordedCommands = result.recordedCommands;
+  } else if (request.state === 'popup commands') {
+    chrome.runtime.sendMessage({
+      recordedCommands: JSON.stringify(recordedCommands),
     });
+  } else if (request.state === 'start') {
+    console.log('hi');
     (activeTab = request.host),
       (recording = false),
       (stop = false),
       recognition.start(),
       console.log(request);
   } else if (request.state === 'stop') {
-    chrome.storage.local.sync.set(
-      { recordedCommands: recordedCommands },
-      function () {
-        console.log(recordedCommands);
-      }
-    );
     (recording = false),
       (stop = true),
       recognition.stop(),
