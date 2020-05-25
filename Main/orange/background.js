@@ -7,6 +7,14 @@ let recordedCommands = {};
 
 chrome.runtime.onMessage.addListener(receiver);
 
+chrome.runtime.sendMessage({
+  msg: 'something_completed',
+  data: {
+    subject: 'Loading',
+    content: 'Just completed!',
+  },
+});
+
 // RECEIVE MESSAGE FUNCTION
 function receiver(request, sender, sendResponse) {
   if (request.state === 'recording') {

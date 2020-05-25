@@ -43,6 +43,7 @@ function stopButtonClicked() {
   }
 }
 
+//Start LISTENING
 document
   .querySelector('#btnGiveCommand')
   .addEventListener('click', startButtonClicked);
