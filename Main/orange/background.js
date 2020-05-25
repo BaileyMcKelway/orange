@@ -39,6 +39,9 @@ function receiver(request, sender, sendResponse) {
     const command = request.command;
     const currentHostObject = recordedCommands[host];
     delete currentHostObject[command];
+    if (Object.keys(currentHostObject).length === 0) {
+      delete recordedCommands[host];
+    }
   }
 }
 
