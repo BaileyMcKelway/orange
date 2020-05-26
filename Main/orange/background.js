@@ -18,8 +18,8 @@ function receiver(request, sender, sendResponse) {
     host = request.host;
     recording = true;
     stop = true;
+    confirm('Click "OK" and then speak single word to record command');
     recognition.start();
-    console.log(request);
   } else if (request.state === 'popup commands') {
     chrome.runtime.sendMessage({
       recordedCommands: JSON.stringify(recordedCommands),
@@ -84,7 +84,6 @@ recognition.onresult = function (event) {
     const last = event.results.length - 1;
 
     const command = event.results[last][0].transcript;
-    // message.textContent = 'Voice Input: ' + command + '.';
 
     let commandSplit = command.toLowerCase().split(' ');
 
@@ -99,10 +98,6 @@ recognition.onresult = function (event) {
       let key = `${command[command.indexOf('orange') + 1]}`;
 
       try {
-        console.log(
-          recordedCommands[activeTab][key],
-          'recordedCommands[activeTab][key]'
-        );
         commandResult(recordedCommands[activeTab][key]);
       } catch (error) {
         console.log(error);
