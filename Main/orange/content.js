@@ -26,7 +26,6 @@ function gotMessage(message, sender, sendResponse) {
     // Sends start message to background if start
   } else if (message.txt === 'start') {
     const host = window.location.hostname;
-    console.log(host);
     isRecording = false;
     let msg = {
       state: 'start',
@@ -44,35 +43,46 @@ function gotMessage(message, sender, sendResponse) {
 
     // Executes button click
   } else if (message.txt === 'command') {
-    let classNames = message.commandResult.split(' ');
-    const length = classNames.length - 1;
-    classNames = classNames.map((className, index = 0) => {
-      if (index === length) {
-        return '.' + `${className}`;
-      } else if (index === 0) {
-        return 'button' + '.' + `${className}`;
-      } else {
-        return '.' + `${className}`;
-      }
-    });
+    let queryReturn = document.getElementsByClassName(message.commandResult);
 
-    let queryReturn = document.querySelectorAll(
-      classNames[classNames.length - 1]
-    );
-    classNames.pop();
-    let counter = 0;
-    while (queryReturn.length !== 1) {
-      if (counter > 10) {
-        break;
-      }
+    if (queryReturn.length === 2) {
+      queryReturn[0].click();
+    } else {
+      let classNames = message.commandResult.split(' ');
+      const length = classNames.length - 1;
+      classNames = classNames.map((className, index = 0) => {
+        if (index === length) {
+          return '.' + `${className}`;
+        } else if (index === 0) {
+          return 'button' + '.' + `${className}`;
+        } else {
+          return '.' + `${className}`;
+        }
+      });
+
       queryReturn = document.querySelectorAll(
         classNames[classNames.length - 1]
       );
       classNames.pop();
-      counter = counter + 1;
-    }
+      let counter = 0;
+      if (queryReturn.length === 1) {
+        queryReturn[0].click();
+      } else {
+        while (queryReturn.length !== 1) {
+          if (counter > 10) {
+            break;
+          }
+          queryReturn = document.querySelectorAll(
+            classNames[classNames.length - 1]
+          );
 
-    queryReturn[0].click();
+          classNames.pop();
+          counter = counter + 1;
+        }
+
+        queryReturn[0].click();
+      }
+    }
   }
 }
 

@@ -99,6 +99,10 @@ recognition.onresult = function (event) {
       let key = `${command[command.indexOf('orange') + 1]}`;
 
       try {
+        console.log(
+          recordedCommands[activeTab][key],
+          'recordedCommands[activeTab][key]'
+        );
         commandResult(recordedCommands[activeTab][key]);
       } catch (error) {
         console.log(error);
