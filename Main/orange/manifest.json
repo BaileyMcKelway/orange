@@ -1,6 +1,6 @@
 {
   "name": "orange",
-  "description": "Voice recognition-enabled Google Chrome Extension to automatically scroll your web pages.",
+  "description": "Google Chrome Extension that uses voice recognition to record and control webpages.",
   "manifest_version": 2,
   "version": "1.0",
   "icons": {
