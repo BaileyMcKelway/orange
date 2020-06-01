@@ -1,4 +1,4 @@
-# Orange
+# orange
 Google Chrome Extension that uses voice recognition to record and control DOM elements on any webpage. 
 
 ## Microphone
