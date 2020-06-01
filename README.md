@@ -1,11 +1,11 @@
 # Orange
 Google Chrome Extension that uses voice recognition to record and control DOM elements on any webpage. 
 
-# Microphone
+## Microphone
 - You need to allow Chrome to use your microphone for this extension
 - Click "Microphone" in the dropdown menu and a microphone icon will appear in your URL bar.
 
-# Record Commands
+## Record Commands
 - Click "Record" in the dropdown menu
 - Recordable buttons will be highlighted in orange
 - Click button you want to record
@@ -13,18 +13,18 @@ Google Chrome Extension that uses voice recognition to record and control DOM el
 
 ![](https://s7.gifyu.com/images/orange-record.gif)
 
-# View Commands
+## View Commands
 - By clicking "Commands" in the dropdown menu you can see commands you have previsously recorded
 
 ![](https://s7.gifyu.com/images/orange-commands.gif)
 
-# Start and Stop
+## Start and Stop
 - By clicking "Start" orange will turn your microphone on and start listening for commands
 - When you say "orange" plus the recorded command word the event you recorded will be executed
 - By clicking "Stop" orange turn your microphone off and stop listening
 
 ![](https://s7.gifyu.com/images/orange-start-and-stop9412c2ef4944db04.gif)
 
-# Tips
+## Tips
 - Some command words work better then others.
 - Some buttons will need multiple commands. For example the Play and Pause buttons would need seperate commands. One for play and the other for pause.
