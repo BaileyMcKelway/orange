@@ -3,7 +3,10 @@ Google Chrome Extension that uses voice recognition to record and control DOM el
 
 ## Microphone
 - You need to allow Chrome to use your microphone for this extension
-- Click "Microphone" in the dropdown menu and a microphone icon will appear in your URL bar.
+- Right click on the orange icon on your browser
+- Click "Options" This will open a new window
+- A microphone icon will appear in your URL, click it
+- Allow microphone for orange chrome extension
 
 ## Record Commands
 - Click "Record" in the dropdown menu
