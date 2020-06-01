@@ -34,7 +34,7 @@ chrome.extension.onMessage.addListener(function (
         a.classList.add('square_btn35');
         a.classList.add(mainKeys);
         a.id = secondary;
-        const linkText = document.createTextNode('x');
+        const linkText = document.createTextNode('[ x ]');
         a.appendChild(linkText);
         a.href = '#';
         td.textContent = secondary;
