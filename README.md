@@ -17,7 +17,7 @@ Google Chrome Extension that uses voice recognition to record and control DOM el
 ![](https://s7.gifyu.com/images/orange-record.gif)
 
 ## View Commands
-- By clicking "Commands" in the dropdown menu you can see commands you have previsously recorded
+- By clicking "Commands" in the dropdown menu you can see commands you have previously recorded
 
 ![](https://s7.gifyu.com/images/orange-commands.gif)
 
