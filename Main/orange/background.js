@@ -1,6 +1,7 @@
 let bgButton;
 let host;
 let activeTab;
+let activeTabId;
 let recording = false;
 let stop = false;
 let recordedCommands = {};
@@ -26,6 +27,7 @@ function receiver(request, sender, sendResponse) {
     });
   } else if (request.state === 'start') {
     (activeTab = request.host),
+      (activeTabId = request.tabId),
       (recording = false),
       (stop = false),
       recognition.start(),
@@ -59,6 +61,7 @@ function commandResult(message) {
       txt: 'command',
       commandResult: message,
     };
+    setGain(activeTabId, 0.25, 'up');
     chrome.tabs.sendMessage(tabs[0].id, msg);
   }
 }
@@ -78,6 +81,29 @@ recognition.grammars = speechRecognitionList;
 recognition.lang = 'en-US';
 recognition.interimResults = false;
 
+let audioStates = {};
+window.audioStates = audioStates;
+const connectStream = (tabId, stream) => {
+  const audioContext = new window.AudioContext();
+  const source = audioContext.createMediaStreamSource(stream);
+  const gainNode = audioContext.createGain();
+  source.connect(gainNode),
+    gainNode.connect(audioContext.destination),
+    (audioStates[tabId] = {
+      audioContext: audioContext,
+      gainNode: gainNode,
+    });
+};
+const setGain = (tabId, level, state) => {
+  if (state === 'down') {
+    audioStates[tabId].gainNode.gain.value =
+      audioStates[tabId].gainNode.gain.value * level;
+  } else if (state === 'up') {
+    audioStates[tabId].gainNode.gain.value =
+      audioStates[tabId].gainNode.gain.value / level;
+  }
+};
+
 //LISTENING
 recognition.onresult = function (event) {
   if (recording === false) {
@@ -93,7 +119,22 @@ recognition.onresult = function (event) {
         const tab = tabs[0];
         const url = new URL(tab.url);
         activeTab = url.hostname;
+        activeTabId = tab.id;
       });
+      chrome.tabCapture.capture(
+        {
+          audio: true,
+          video: false,
+        },
+        (stream) => {
+          if (chrome.runtime.lastError) {
+            return;
+          } else {
+            connectStream(activeTabId, stream);
+            setGain(activeTabId, 0.25, 'down');
+          }
+        }
+      );
       let command = commandSplit;
       let key = `${command[command.indexOf('orange') + 1]}`;
 

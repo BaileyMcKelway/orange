@@ -19,5 +19,5 @@
   ],
   "background": { "scripts": ["background.js"] },
   "options_page": "permission.html",
-  "permissions": ["tabs", "*://*/*", "<all_urls>", "activeTab", "storage"]
+  "permissions": ["tabs", "*://*/*", "<all_urls>", "activeTab", "tabCapture"]
 }
