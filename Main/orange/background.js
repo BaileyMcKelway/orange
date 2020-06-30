@@ -4,7 +4,10 @@ let activeTab;
 let activeTabId;
 let recording = false;
 let stop = false;
+let listening = false;
 let recordedCommands = {};
+
+const soundAlert = new Audio(chrome.runtime.getURL('./orange_alert.mp3'));
 
 chrome.runtime.onMessage.addListener(receiver);
 
@@ -61,7 +64,7 @@ function commandResult(message) {
       txt: 'command',
       commandResult: message,
     };
-    setGain(activeTabId, 0.25, 'up');
+
     chrome.tabs.sendMessage(tabs[0].id, msg);
   }
 }
@@ -105,47 +108,56 @@ const setGain = (tabId, level, state) => {
 };
 
 //LISTENING
-recognition.onresult = function (event) {
+recognition.onresult = async function (event) {
   if (recording === false) {
     const last = event.results.length - 1;
 
-    const command = event.results[last][0].transcript;
+    let command = event.results[last][0].transcript;
 
     let commandSplit = command.toLowerCase().split(' ');
 
     //EXECUTE COMMANDS
     if (commandSplit.includes('orange')) {
-      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      await chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         const tab = tabs[0];
+
         const url = new URL(tab.url);
         activeTab = url.hostname;
         activeTabId = tab.id;
       });
-      chrome.tabCapture.capture(
+
+      await chrome.tabCapture.capture(
         {
           audio: true,
           video: false,
         },
         (stream) => {
           if (chrome.runtime.lastError) {
+            console.log('hi', 1);
             return;
           } else {
             connectStream(activeTabId, stream);
-            setGain(activeTabId, 0.25, 'down');
+            setGain(activeTabId, 0.1, 'down');
+            listening = true;
+            soundAlert.play();
           }
         }
       );
-      let command = commandSplit;
-      let key = `${command[command.indexOf('orange') + 1]}`;
-
+    } else if (listening === true && recording === false) {
+      console.log('hi', 2);
+      let key = `${commandSplit[0]}`;
       try {
+        listening = false;
         commandResult(recordedCommands[activeTab][key]);
+        setGain(activeTabId, 0.1, 'up');
       } catch (error) {
+        listening = false;
         console.log(error);
       }
     }
     //ASSIGN NEW OBJ PROPERTY
   } else if (recording === true) {
+    console.log('hi', 3);
     const last = event.results.length - 1;
 
     const command = event.results[last][0].transcript;
