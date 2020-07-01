@@ -30,7 +30,7 @@ function receiver(request, sender, sendResponse) {
     });
   } else if (request.state === 'start') {
     (activeTab = request.host),
-      (activeTabId = request.tabId),
+      // (activeTabId = request.tabId),
       (recording = false),
       (stop = false),
       recognition.start(),
@@ -107,8 +107,35 @@ const setGain = (tabId, level, state) => {
   }
 };
 
+function afterQuery() {
+  if (audioStates[activeTabId]) {
+    console.log(activeTabId, activeTab);
+    setGain(activeTabId, 0.1, 'down');
+    listening = true;
+    soundAlert.play();
+  } else {
+    chrome.tabCapture.capture(
+      {
+        audio: true,
+        video: false,
+      },
+      (stream) => {
+        if (chrome.runtime.lastError) {
+          listening = false;
+          return;
+        } else {
+          connectStream(activeTabId, stream);
+          setGain(activeTabId, 0.1, 'down');
+          listening = true;
+          soundAlert.play();
+        }
+      }
+    );
+  }
+}
+
 //LISTENING
-recognition.onresult = async function (event) {
+recognition.onresult = function (event) {
   if (recording === false) {
     const last = event.results.length - 1;
 
@@ -118,38 +145,18 @@ recognition.onresult = async function (event) {
 
     //EXECUTE COMMANDS
     if (commandSplit.includes('orange')) {
-      await chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         const tab = tabs[0];
-
-        const url = new URL(tab.url);
-        activeTab = url.hostname;
-        activeTabId = tab.id;
+        if (tab) {
+          const url = new URL(tab.url);
+          activeTab = url.hostname;
+          activeTabId = tab.id;
+          afterQuery();
+        }
+        console.log(activeTabId);
       });
 
       // Check if already stored in audioStates
-      if (audioStates[activeTabId]) {
-        setGain(activeTabId, 0.1, 'down');
-        listening = true;
-        soundAlert.play();
-      } else {
-        await chrome.tabCapture.capture(
-          {
-            audio: true,
-            video: false,
-          },
-          (stream) => {
-            if (chrome.runtime.lastError) {
-              console.log('hi', 1);
-              return;
-            } else {
-              connectStream(activeTabId, stream);
-              setGain(activeTabId, 0.1, 'down');
-              listening = true;
-              soundAlert.play();
-            }
-          }
-        );
-      }
     } else if (listening === true && recording === false) {
       console.log('hi', 2);
       let key = `${commandSplit[0]}`;
