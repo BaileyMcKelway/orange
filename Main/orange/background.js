@@ -126,23 +126,30 @@ recognition.onresult = async function (event) {
         activeTabId = tab.id;
       });
 
-      await chrome.tabCapture.capture(
-        {
-          audio: true,
-          video: false,
-        },
-        (stream) => {
-          if (chrome.runtime.lastError) {
-            console.log('hi', 1);
-            return;
-          } else {
-            connectStream(activeTabId, stream);
-            setGain(activeTabId, 0.1, 'down');
-            listening = true;
-            soundAlert.play();
+      // Check if already stored in audioStates
+      if (audioStates[activeTabId]) {
+        setGain(activeTabId, 0.1, 'down');
+        listening = true;
+        soundAlert.play();
+      } else {
+        await chrome.tabCapture.capture(
+          {
+            audio: true,
+            video: false,
+          },
+          (stream) => {
+            if (chrome.runtime.lastError) {
+              console.log('hi', 1);
+              return;
+            } else {
+              connectStream(activeTabId, stream);
+              setGain(activeTabId, 0.1, 'down');
+              listening = true;
+              soundAlert.play();
+            }
           }
-        }
-      );
+        );
+      }
     } else if (listening === true && recording === false) {
       console.log('hi', 2);
       let key = `${commandSplit[0]}`;
