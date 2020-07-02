@@ -195,6 +195,10 @@ recognition.onresult = function (event) {
 
 //CATCH RECOGNITION ERRORS
 recognition.onerror = function (event) {
+  if (listening === true) {
+    listening = false;
+    setGain(activeTabId, 0.1, 'up');
+  }
   console.log(event);
 };
 
