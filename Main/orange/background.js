@@ -30,7 +30,6 @@ function receiver(request, sender, sendResponse) {
     });
   } else if (request.state === 'start') {
     (activeTab = request.host),
-      // (activeTabId = request.tabId),
       (recording = false),
       (stop = false),
       recognition.start(),
@@ -69,21 +68,7 @@ function commandResult(message) {
   }
 }
 
-// Create Speech Recognition instance
-var SpeechRecognition =
-  window.SpeechRecognition || window.webkitSpeechRecognition;
-var SpeechGrammarList =
-  window.SpeechGrammarList || window.webkitSpeechGrammarList;
-
-const grammar = '#JSGF V1.0;';
-
-var recognition = new SpeechRecognition();
-var speechRecognitionList = new SpeechGrammarList();
-speechRecognitionList.addFromString(grammar, 1);
-recognition.grammars = speechRecognitionList;
-recognition.lang = 'en-US';
-recognition.interimResults = false;
-
+// STORES AUDIO NODES
 let audioStates = {};
 window.audioStates = audioStates;
 const connectStream = (tabId, stream) => {
@@ -97,6 +82,8 @@ const connectStream = (tabId, stream) => {
       gainNode: gainNode,
     });
 };
+
+// RAISES AND LOWERS GAIN OF NODE
 const setGain = (tabId, level, state) => {
   if (state === 'down') {
     audioStates[tabId].gainNode.gain.value =
@@ -107,6 +94,7 @@ const setGain = (tabId, level, state) => {
   }
 };
 
+// AFTER ACTIVE TAB FOUND
 function afterQuery() {
   if (audioStates[activeTabId]) {
     console.log(activeTabId, activeTab);
@@ -134,6 +122,21 @@ function afterQuery() {
   }
 }
 
+// Create Speech Recognition instance
+var SpeechRecognition =
+  window.SpeechRecognition || window.webkitSpeechRecognition;
+var SpeechGrammarList =
+  window.SpeechGrammarList || window.webkitSpeechGrammarList;
+
+const grammar = '#JSGF V1.0;';
+
+var recognition = new SpeechRecognition();
+var speechRecognitionList = new SpeechGrammarList();
+speechRecognitionList.addFromString(grammar, 1);
+recognition.grammars = speechRecognitionList;
+recognition.lang = 'en-US';
+recognition.interimResults = false;
+
 //LISTENING
 recognition.onresult = function (event) {
   if (recording === false) {
@@ -143,7 +146,7 @@ recognition.onresult = function (event) {
 
     let commandSplit = command.toLowerCase().split(' ');
 
-    //EXECUTE COMMANDS
+    //CHECK FOR ORANGE
     if (commandSplit.includes('orange')) {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         const tab = tabs[0];
@@ -153,25 +156,28 @@ recognition.onresult = function (event) {
           activeTabId = tab.id;
           afterQuery();
         }
-        console.log(activeTabId);
       });
 
-      // Check if already stored in audioStates
+      //EXECUTE COMMANDS
     } else if (listening === true && recording === false) {
-      console.log('hi', 2);
       let key = `${commandSplit[0]}`;
       try {
-        listening = false;
-        commandResult(recordedCommands[activeTab][key]);
-        setGain(activeTabId, 0.1, 'up');
+        if (recordedCommands[activeTab][key]) {
+          listening = false;
+          commandResult(recordedCommands[activeTab][key]);
+          setGain(activeTabId, 0.1, 'up');
+        } else {
+          listening = false;
+          setGain(activeTabId, 0.1, 'up');
+        }
       } catch (error) {
         listening = false;
+        setGain(activeTabId, 0.1, 'up');
         console.log(error);
       }
     }
     //ASSIGN NEW OBJ PROPERTY
   } else if (recording === true) {
-    console.log('hi', 3);
     const last = event.results.length - 1;
 
     const command = event.results[last][0].transcript;
