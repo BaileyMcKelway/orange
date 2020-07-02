@@ -7,7 +7,7 @@ let stop = false;
 let listening = false;
 let recordedCommands = {};
 
-const soundAlert = new Audio(chrome.runtime.getURL('./orange_alert.mp3'));
+const soundAlert = new Audio(chrome.runtime.getURL('./img/orange_alert.mp3'));
 
 chrome.runtime.onMessage.addListener(receiver);
 
