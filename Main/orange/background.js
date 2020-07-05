@@ -52,20 +52,12 @@ function receiver(request, sender, sendResponse) {
 
 // SEND MESSAGE FUNCTION
 function commandResult(message) {
-  let params = {
-    active: true,
-    currentWindow: true,
+  let msg = {
+    txt: 'command',
+    commandResult: message,
   };
-  chrome.tabs.query(params, gotTab);
 
-  function gotTab(tabs) {
-    let msg = {
-      txt: 'command',
-      commandResult: message,
-    };
-
-    chrome.tabs.sendMessage(tabs[0].id, msg);
-  }
+  chrome.tabs.sendMessage(activeTabId, msg);
 }
 
 // STORES AUDIO NODES
@@ -97,7 +89,6 @@ const setGain = (tabId, level, state) => {
 // AFTER ACTIVE TAB FOUND
 function afterQuery() {
   if (audioStates[activeTabId]) {
-    console.log(activeTabId, activeTab);
     setGain(activeTabId, 0.1, 'down');
     listening = true;
     soundAlert.play();
@@ -163,16 +154,11 @@ recognition.onresult = function (event) {
       let key = `${commandSplit[0]}`;
       try {
         if (recordedCommands[activeTab][key]) {
-          listening = false;
           commandResult(recordedCommands[activeTab][key]);
-          setGain(activeTabId, 0.1, 'up');
-        } else {
-          listening = false;
-          setGain(activeTabId, 0.1, 'up');
         }
-      } catch (error) {
         listening = false;
         setGain(activeTabId, 0.1, 'up');
+      } catch (error) {
         console.log(error);
       }
     }
