@@ -15,6 +15,7 @@ function gotMessage(message, sender, sendResponse) {
     isRecording = true;
     const buttons = document.getElementsByTagName('button');
     gotButtons = buttons;
+
     addhighLightButtons(buttons);
 
     //Listen for user input

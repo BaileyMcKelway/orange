@@ -1,9 +1,13 @@
 let bgButton;
 let host;
 let activeTab;
+let activeTabId;
 let recording = false;
 let stop = false;
+let listening = false;
 let recordedCommands = {};
+
+const soundAlert = new Audio(chrome.runtime.getURL('./img/orange_alert.mp3'));
 
 chrome.runtime.onMessage.addListener(receiver);
 
@@ -48,18 +52,64 @@ function receiver(request, sender, sendResponse) {
 
 // SEND MESSAGE FUNCTION
 function commandResult(message) {
-  let params = {
-    active: true,
-    currentWindow: true,
+  let msg = {
+    txt: 'command',
+    commandResult: message,
   };
-  chrome.tabs.query(params, gotTab);
 
-  function gotTab(tabs) {
-    let msg = {
-      txt: 'command',
-      commandResult: message,
-    };
-    chrome.tabs.sendMessage(tabs[0].id, msg);
+  chrome.tabs.sendMessage(activeTabId, msg);
+}
+
+// STORES AUDIO NODES
+let audioStates = {};
+window.audioStates = audioStates;
+const connectStream = (tabId, stream) => {
+  const audioContext = new window.AudioContext();
+  const source = audioContext.createMediaStreamSource(stream);
+  const gainNode = audioContext.createGain();
+  source.connect(gainNode),
+    gainNode.connect(audioContext.destination),
+    (audioStates[tabId] = {
+      audioContext: audioContext,
+      gainNode: gainNode,
+    });
+};
+
+// RAISES AND LOWERS GAIN OF NODE
+const setGain = (tabId, level, state) => {
+  if (state === 'down') {
+    audioStates[tabId].gainNode.gain.value =
+      audioStates[tabId].gainNode.gain.value * level;
+  } else if (state === 'up') {
+    audioStates[tabId].gainNode.gain.value =
+      audioStates[tabId].gainNode.gain.value / level;
+  }
+};
+
+// AFTER ACTIVE TAB FOUND
+function afterQuery() {
+  if (audioStates[activeTabId]) {
+    setGain(activeTabId, 0.1, 'down');
+    listening = true;
+    soundAlert.play();
+  } else {
+    chrome.tabCapture.capture(
+      {
+        audio: true,
+        video: false,
+      },
+      (stream) => {
+        if (chrome.runtime.lastError) {
+          listening = false;
+          return;
+        } else {
+          connectStream(activeTabId, stream);
+          setGain(activeTabId, 0.1, 'down');
+          listening = true;
+          soundAlert.play();
+        }
+      }
+    );
   }
 }
 
@@ -83,22 +133,31 @@ recognition.onresult = function (event) {
   if (recording === false) {
     const last = event.results.length - 1;
 
-    const command = event.results[last][0].transcript;
+    let command = event.results[last][0].transcript;
 
     let commandSplit = command.toLowerCase().split(' ');
 
-    //EXECUTE COMMANDS
+    //CHECK FOR ORANGE
     if (commandSplit.includes('orange')) {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         const tab = tabs[0];
-        const url = new URL(tab.url);
-        activeTab = url.hostname;
+        if (tab) {
+          const url = new URL(tab.url);
+          activeTab = url.hostname;
+          activeTabId = tab.id;
+          afterQuery();
+        }
       });
-      let command = commandSplit;
-      let key = `${command[command.indexOf('orange') + 1]}`;
 
+      //EXECUTE COMMANDS
+    } else if (listening === true && recording === false) {
+      let key = `${commandSplit[0]}`;
       try {
-        commandResult(recordedCommands[activeTab][key]);
+        if (recordedCommands[activeTab][key]) {
+          commandResult(recordedCommands[activeTab][key]);
+        }
+        listening = false;
+        setGain(activeTabId, 0.1, 'up');
       } catch (error) {
         console.log(error);
       }
@@ -122,6 +181,10 @@ recognition.onresult = function (event) {
 
 //CATCH RECOGNITION ERRORS
 recognition.onerror = function (event) {
+  if (listening === true) {
+    listening = false;
+    setGain(activeTabId, 0.1, 'up');
+  }
   console.log(event);
 };
 
