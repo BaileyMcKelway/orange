@@ -33,5 +33,5 @@ Google Chrome Extension that uses voice recognition to record and control DOM el
 - Some buttons will need multiple commands. For example the Play and Pause buttons would need seperate commands. One for play and the other for pause.
 
 ## Articles
-![How I made a chrome extension that uses vocal recognition to control DOM elements on a webpage.](https://medium.com/dev-genius/how-i-made-a-chrome-extension-that-uses-vocal-recognition-to-control-dom-elements-on-a-webpage-a3a5cb19a584)
-![Improving the Vocal Recognition Instance of my chrome extension](https://medium.com/dev-genius/improving-the-vocal-recognition-instance-of-my-chrome-extension-73a36d470542)
+[How I made a chrome extension that uses vocal recognition to control DOM elements on a webpage.](https://medium.com/dev-genius/how-i-made-a-chrome-extension-that-uses-vocal-recognition-to-control-dom-elements-on-a-webpage-a3a5cb19a584)
+[Improving the Vocal Recognition Instance of my chrome extension](https://medium.com/dev-genius/improving-the-vocal-recognition-instance-of-my-chrome-extension-73a36d470542)
