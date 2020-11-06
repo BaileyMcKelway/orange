@@ -4,7 +4,7 @@
   "manifest_version": 2,
   "version": "2.0",
   "icons": {
-    "128": "img/orange.png"
+    "128": "s=Static/img/orange.png"
   },
   "offline_enabled": false,
   "browser_action": {
@@ -14,10 +14,10 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["content.js"]
+      "js": ["Content/content.js"]
     }
   ],
-  "background": { "scripts": ["background.js"] },
-  "options_page": "permission.html",
+  "background": { "scripts": ["Background/background.js"] },
+  "options_page": "Content/permission.html",
   "permissions": ["tabs", "*://*/*", "<all_urls>", "activeTab", "tabCapture"]
 }
